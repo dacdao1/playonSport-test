@@ -9,8 +9,10 @@
         {{ option.text }}
       </option>
     </select></b-col>
-          <b-col sm="4">Start Date: <input v-model="startDate" v-on:keyup.enter="getStateAssociation()"></b-col>
-          <b-col sm="4">End Date: <input v-model="endDate" v-on:keyup.enter="getStateAssociation()"></b-col>
+
+          <b-col sm="4">Start Date: <input v-model="startDate" v-on:blur="getStateAssociation" v-on:keyup.enter="$event.target.blur()" ></b-col>
+          <b-col sm="4">End Date: <input v-model="endDate" v-on:blur="getStateAssociation"
+            v-on:keyup.enter="$event.target.blur()" ></b-col>
         </b-row>
 
 
@@ -22,9 +24,7 @@
 
 
 
-
-
-<div class="container image1">
+<div v-if="noDate==false" class="container">
        <div class="row">
            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12" v-for="(n, index) in headline" :key="index">
 
@@ -34,20 +34,20 @@ overlay
     :title="n.headline"
     :img-src="n.background_image"
     text-variant="white"
-    style= "max-width: 90em; max-height: 90em"
+    style= "max-width: 90em; max-height: 90em; "
     border-variant="light"
     class="mt-3"
 
   >
 
-    <b-card-text style="color: white;   font-weight: 900;">
+    <b-card-text style="color: white;font-weight: 700; filter: drop-shadow(.15em .15em black);">
       {{n.subheadline}}
     </b-card-text>
 
-<b-card-text>
+<b-card-text style="margin-top: auto">
   key: {{n.key}}
   <div>
-    <b-card-text style="color: white;   font-weight: 700;">
+    <b-card-text style="color: white;font-weight: 700;">
       date: {{getDate(n.date)}}
     </b-card-text>
   </div>
@@ -62,7 +62,12 @@ overlay
 </div>
 
 
+<div v-else>
+  <h1 style="color:white;">
+    The date range you enter doesn't have any event. Please retry again.
+  </h1>
 
+</div>
 
 
 
@@ -71,6 +76,8 @@ overlay
 
 
     </div>
+
+
 
   </div>
 </template>
@@ -92,27 +99,43 @@ export default {
     ],
     headline: [],
 
-    time:[],
-
+    noDate:false,
+    someResult: '',
 
 
     }
   },
   methods: {
+
     getStateAssociation (){
-
-
-
+      if(this.selected==null){
+        alert('Please choose a State Association')
+      }
+      this.noDate = false,
       this.headline=[];
-      if(this.startDate != null){
-          var userInputFrom = moment(this.startDate).format('YYYY-MM-DD');
+      var userInputFrom;
+      var userInputTo;
+
+      if(  this.startDate != null&&this.startDate.includes(':') ==true){
+          var userInputFrom = moment(this.startDate).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+          if(this.startDate.includes('Invalid') == true){
+            alert('Please re-enter the date')
+          }
+
+      }else if( this.startDate != null){
+        var userInputFrom = moment(this.startDate).format('YYYY-MM-DD');
       }else{
         var userInputFrom = '';
       }
 
-      if(this.endDate != null){
-        var userInputTo =
-        moment(this.endDate).format('YYYY-MM-DD');
+
+      if( this.endDate != null &&this.endDate.includes(':') ==true){
+          var userInputTo = moment(this.endDate).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+          if(this.endDate.includes('Invalid') == true){
+            alert('Please re-enter the date')
+          }
+      }else if( this.endDate != null){
+        var userInputTo = moment(this.endDate).format('YYYY-MM-DD');
       }else{
         var userInputTo = '';
       }
@@ -129,24 +152,18 @@ export default {
           })
         }
   getStateAsso(this.selected, userInputFrom, userInputTo).then(data=>{
-for(var i=0;i<data.size;i++)
+for(var i=0;i<data.items.length;i++)
 {
 
   var headline = data.items[i];
-
    this.headline.push(headline);
 
 }
 
-
-for(var i=0;i<data.items.length;i++)
-{
-
-  var hello = data.items[i];
-
-
-
+if(this.headline.length ==0){
+  this.noDate = true
 }
+
 
 
 
@@ -155,8 +172,11 @@ for(var i=0;i<data.items.length;i++)
 
 },
 getDate(datetime){
-  let date = moment(datetime).format('MMMM Do YYYY, h:mm:ss a')
-  return date
+  let date = moment(datetime).utc().format('MMMM DD YYYY, h:mm:ss a')
+
+    return date
+
+
 }
 }}
 </script>
@@ -165,6 +185,7 @@ getDate(datetime){
 <style scoped>
 .entirePage{
   min-height: 100vh;
+ overflow-x: hidden;
   background: #09121A;
   color:white;
   padding-top: 40px;
@@ -173,7 +194,6 @@ getDate(datetime){
 .card-columns {
   display: flex;
 }
-img{
-  filter:blur(4px);
-}
+
+
 </style>

@@ -44,10 +44,10 @@ overlay
       {{n.subheadline}}
     </b-card-text>
 
-<b-card-text style="margin-top: auto">
+<b-card-text style="margin-top: auto; filter: drop-shadow(.15em .15em black);">
   key: {{n.key}}
   <div>
-    <b-card-text style="color: white;font-weight: 700;">
+    <b-card-text style="color: white;font-weight: 700; filter: drop-shadow(.10em .10em black);">
       date: {{getDate(n.date)}}
     </b-card-text>
   </div>

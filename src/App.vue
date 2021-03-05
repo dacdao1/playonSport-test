@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <NavbarMenu />
-    <Events/>
+    <Events />
     <Footer />
   </div>
 </template>
@@ -22,6 +22,6 @@ export default {
 
 <style>
 #app {
-background:#fff;
+  background: #fff;
 }
 </style>
